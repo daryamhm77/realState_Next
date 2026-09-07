@@ -9,6 +9,14 @@ import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site-url";
 import { messages } from "@/messages";
 
+function stripTrailingSlash(value: string) {
+  return value.replace(/\/$/, "");
+}
+
+function httpsOriginFromHost(host: string) {
+  return `https://${host.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+}
+
 function isLoopbackOrigin(origin: string) {
   try {
     const url = new URL(origin);
@@ -21,8 +29,33 @@ function isLoopbackOrigin(origin: string) {
   }
 }
 
+function getAuthBaseURL() {
+  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL) {
+    return httpsOriginFromHost(process.env.VERCEL_URL);
+  }
+
+  return process.env.BETTER_AUTH_URL ?? getSiteUrl();
+}
+
 function getTrustedOrigins(request?: Request) {
-  const origins = new Set<string>([getSiteUrl()]);
+  const origins = new Set<string>([stripTrailingSlash(getSiteUrl())]);
+
+  if (process.env.BETTER_AUTH_URL) {
+    origins.add(stripTrailingSlash(process.env.BETTER_AUTH_URL));
+  }
+
+  for (const host of [
+    process.env.VERCEL_URL,
+    process.env.VERCEL_BRANCH_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+  ]) {
+    if (host) {
+      origins.add(httpsOriginFromHost(host));
+    }
+  }
+
+  origins.add("https://real-state-next-*.vercel.app");
+
   const headerOrigin = request?.headers.get("origin");
 
   if (headerOrigin && isLoopbackOrigin(headerOrigin)) {
@@ -34,7 +67,7 @@ function getTrustedOrigins(request?: Request) {
 
 export const auth = betterAuth({
   appName: messages.site.legalName,
-  baseURL: process.env.BETTER_AUTH_URL ?? getSiteUrl(),
+  baseURL: getAuthBaseURL(),
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(db, {
     provider: "postgresql",
