@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src="docs/logo.webp" alt="Homeland Real Estate" width="280" />
+</p>
 
-## Getting Started
+<h1 align="center">Homeland</h1>
 
-First, run the development server:
+<p align="center">
+  A single-agency real estate site for browsing, comparing, and saving homes for sale and rent.
+</p>
+
+Homeland is a Next.js app for a brokerage that publishes every listing it represents. Guests can search the catalog, filter by buy / rent / commercial, and compare up to three homes. Signed-in customers can save favorites. Staff manage categories, listings, photos, amenities, and CMS pages from an admin panel.
+
+---
+
+## Features
+
+- **Public catalog** — featured homes on the landing page, searchable listings, and property detail pages
+- **Search and filters** — city, address, or listing name, plus buy / rent / commercial, category, price, beds, and baths
+- **Compare** — add up to three listings; the selection stays on this device
+- **Favorites** — save homes to a private list (requires an account)
+- **Accounts** — email and password signup / login, with automatic sign-in after registration
+- **Admin** — create and edit properties, media, categories, amenities, and site pages
+- **CMS pages** — About, Services, Contact, and other published pages in the header or footer
+- **SEO** — metadata, sitemap, robots, and server-rendered public HTML
+
+---
+
+## Tech stack
+
+| Area | Tools |
+| --- | --- |
+| App | [Next.js](https://nextjs.org) 16 (App Router), [React](https://react.dev) 19, TypeScript |
+| UI | [Tailwind CSS](https://tailwindcss.com) 4, [shadcn/ui](https://ui.shadcn.com), [Base UI](https://base-ui.com), [Lucide](https://lucide.dev) |
+| Data | [PostgreSQL](https://www.postgresql.org), [Prisma](https://www.prisma.io) 7 |
+| Auth | [Better Auth](https://www.better-auth.com) (email and password) |
+| Forms and validation | [react-hook-form](https://react-hook-form.com), [Zod](https://zod.dev) |
+| Client state | [TanStack Query](https://tanstack.com/query), [Zustand](https://zustand-demo.pmnd.rs) (compare list) |
+| Tooling | ESLint, Docker Compose, `tsx` for Prisma seed |
+
+---
+
+## Getting started
+
+**Requirements:** Node.js 20+, npm, and Docker (for Postgres).
 
 ```bash
+cp .env.example .env
+docker compose up -d
+npx prisma migrate deploy
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set `BETTER_AUTH_SECRET` in `.env` to a long random string. `ADMIN_EMAIL` is the address that receives the admin role on first signup.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run typecheck` | TypeScript check |
+| `npm run db:migrate` | Create / apply Prisma migrations |
+| `npm run db:seed` | Seed categories, listings, and CMS pages |
+| `npm run db:studio` | Open Prisma Studio |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Project layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+src/app/          routes (public, auth, private/admin, API)
+src/features/     screens and feature UI
+src/components/   layout and shared UI
+src/connections/  server data access
+src/contracts/    Zod schemas
+src/lib/          auth, db, SEO helpers
+prisma/           schema, migrations, seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for rendering, caching, and layering rules.
