@@ -55,6 +55,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Set `BETTER_AUTH_SECRET` in `.env` to a long random string. `ADMIN_EMAIL` is the address that receives the admin role on first signup.
 
+Listing photos are stored in Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set (required on Vercel). Without that token, local `npm run dev` still writes to `public/uploads`.
+
 | Script | Purpose |
 | --- | --- |
 | `npm run dev` | Development server |

@@ -1,10 +1,8 @@
-import { unlink } from "node:fs/promises";
-import path from "node:path";
-
 import { deletePropertyImage, setPropertyCover } from "@/connections";
 import { apiError, requireAdminApi } from "@/lib/admin-api";
 import { revalidateCatalog } from "@/lib/catalog-cache";
 import { privateJson } from "@/lib/private-json";
+import { removeStoredPhoto } from "@/lib/property-media-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -41,15 +39,7 @@ export async function DELETE(
     return apiError("Photo not found.", 404);
   }
 
-  if (image.url.startsWith("/uploads/")) {
-    const filePath = path.join(process.cwd(), "public", image.url);
-
-    try {
-      await unlink(filePath);
-    } catch {
-      // The database row is already gone; a missing file is not fatal.
-    }
-  }
+  await removeStoredPhoto(image.url);
 
   revalidateCatalog();
   return privateJson({ data: { id: imageId } });

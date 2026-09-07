@@ -8,6 +8,7 @@ import {
 import { apiError, parseJsonBody, requireAdminApi } from "@/lib/admin-api";
 import { revalidateCatalog } from "@/lib/catalog-cache";
 import { privateJson } from "@/lib/private-json";
+import { removeStoredPhotos } from "@/lib/property-media-storage";
 import { slugify, uniqueSlug } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
@@ -91,7 +92,9 @@ export async function DELETE(
     return apiError("Property not found.", 404);
   }
 
+  const photoUrls = existing.images.map((image) => image.url);
   await deleteProperty(id);
+  await removeStoredPhotos(photoUrls);
   revalidateCatalog();
   return privateJson({ data: { id } });
 }
