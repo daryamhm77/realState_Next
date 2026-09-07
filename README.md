@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.webp" alt="Homeland Real Estate" width="280" />
+  <img src="public/logo.png" alt="Homeland Real Estate" width="280" />
 </p>
 
 <h1 align="center">Homeland</h1>
